@@ -76,7 +76,8 @@
                     backgroundColor: 'rgba(255, 193, 7, 0.1)',
                     borderWidth: 2,
                     tension: 0.3,
-                    fill: false
+                    fill: false,
+                    hidden:true
                 }]
             },
             options: {
