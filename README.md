@@ -54,10 +54,3 @@ Finex
 │  └─ supprimer.php         
 ├─ Finex.php                
 └─ README.md                
-
-
-
-=========================================================
-
-$email = 'BanqueFinex@gmail.com';
-$password = 'B@nqu3F!nEx2025#'; 
