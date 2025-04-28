@@ -41,7 +41,7 @@
         var secondes = String(now.getSeconds()).padStart(2, '0');
 
         var dateHeureFormattee = jour + '/' + mois + '/' + annee + ' ' + heures + ':' + minutes + ':' + secondes;
-        dateHeureElement.innerHTML = 'Bienvenue,Administrateur - ' + dateHeureFormattee;
+        dateHeureElement.innerHTML = 'Bienvenue Administrateur - ' + dateHeureFormattee;
     }
 
     // Mettre à jour la date et l'heure toutes les secondes
