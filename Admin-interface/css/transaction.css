@@ -1,0 +1,224 @@
+
+/* Styles spécifiques pour la table de transaction.php */
+.transaction-table {
+    width: 90%;
+    border-collapse: collapse;
+    margin: 20px 30px;
+    background-color: #F1F5F9;
+     /* Ombre légère */
+    border-radius: 8px; /* Bords arrondis */
+    overflow: hidden; /* Empêche l'ombre de dépasser les bords arrondis */
+}
+
+.transaction-table th, 
+.transaction-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0; /* Ligne de séparation plus claire */
+}
+
+.transaction-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+.transaction-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.transaction-table tbody tr:hover {
+    background-color: #fff; /* Couleur de survol subtile */
+    transition: background-color 0.2s ease-in-out;
+}
+
+/* Styles spécifiques pour les liens dans la table de transaction.php */
+.transaction-table a {
+    text-decoration: none;
+    padding: 5px 10px;
+    margin-right: 5px;
+    border-radius: 3px;
+    color: #fff;
+}
+
+.transaction-table a:hover {
+    opacity: 0.8;
+}
+
+.transaction-table a[href*="modifier.php"] {
+    background-color: #007bff; /* Bleu pour Modifier */
+}
+
+.transaction-table a[href*="supprimer.php"] {
+    background-color: #dc3545; /* Rouge pour Supprimer */
+}
+
+/* Styles spécifiques pour les boutons dans transaction.php */
+.transaction-add-button {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    border-radius: 5px;
+}
+
+.transaction-action-button {
+    background-color: #007bff;
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    border-radius: 5px;
+}
+
+.transaction-delete-button {
+    background-color: #f44336;
+}
+
+
+.search-input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    width: 250px; /* Ajustez la largeur selon vos besoins */
+    box-sizing: border-box; /* Inclure la bordure et le padding dans la largeur */
+    margin-right: 10px; /* Ajouter un espacement à droite si nécessaire */
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #007bff; /* Couleur de la bordure lors du focus */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Ajouter une ombre lors du focus */
+}
+
+.search-input::placeholder {
+    color: #999; /* Couleur du placeholder */
+}
+
+
+    .search-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .add-button {
+        background-color: #4CAF50;
+        border: none;
+        color: white;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        border-radius: 5px;
+    }
+
+    .search-form {
+        display: inline-block;
+    }
+
+    .search-button {
+        background-color: #007bff;
+        border: none;
+        color: white;
+        padding: 10px 15px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        border-radius: 5px;
+    }
+
+
+    .transaction-action-button {
+        border: none;
+        color: white;
+        padding: 5px 10px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 14px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .transaction-download-button {
+        background-color: #4CAF50; /* Couleur verte pour le téléchargement */
+    }
+
+    .transaction-download-button:hover {
+        background-color: #218838; /* Couleur verte plus foncée au survol */
+    }
+
+    .table-container {
+        margin-top :  10px ;
+        max-height: 700px; /* Définissez la hauteur maximale souhaitée */
+        overflow-y: auto;
+        border-radius : 20px;
+        
+    
+    }
+
+    thead {
+        position: sticky;
+        top: 0;
+        background-color: #f2f2f2; /* Couleur de fond de l'en-tête */
+        background-color: #f8f9fa; /* Gris très clair pour l'en-tête */
+        color: #495057; /* Couleur de texte plus douce pour l'en-tête */
+        font-weight: 600; /* Gras léger */
+    }
+
+    /* Style de la barre de défilement entière */
+::-webkit-scrollbar {
+    width: 10px; /* Largeur de la barre de défilement */
+}
+
+/* Style de la piste de la barre de défilement */
+::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Couleur de fond de la piste */
+}
+
+/* Style du "pouce" (la partie que vous faites glisser) */
+::-webkit-scrollbar-thumb {
+    background: #888; /* Couleur du pouce */
+    border-radius: 5px; /* Bordure arrondie du pouce */
+}
+
+/* Style du pouce au survol */
+::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Couleur du pouce au survol */
+}
+
+
+
+.table-container {
+    margin-top :  50px ;
+    max-height: 700px; /* Définissez la hauteur maximale souhaitée */
+    overflow-y: auto;
+    border-radius : 20px;
+    
+
+}
+
+thead tr{
+    position: sticky;
+    top: 0;
+    background-color: #f2f2f2; /* Couleur de fond de l'en-tête */
+    background-color: #f8f9fa; /* Gris très clair pour l'en-tête */
+    color: #495057; /* Couleur de texte plus douce pour l'en-tête */
+    font-weight: 600; /* Gras léger */
+}
+
+
+tbody tr:hover {
+    background-color: #fff; /* Couleur de survol subtile */
+    transition: background-color 0.2s ease-in-out;
+}

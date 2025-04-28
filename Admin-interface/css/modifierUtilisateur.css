@@ -1,0 +1,90 @@
+/* Styles spécifiques pour le formulaire de modification de client */
+.modifier-client-container {
+    font-family: 'Poppins', sans-serif;
+    margin: 20px;
+   
+}
+
+.modifier-client-container h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+.modifier-client-container form {
+    width: 500px;
+    margin: 20px auto;
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.modifier-client-container label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #333;
+}
+
+.modifier-client-container input[type="text"],
+.modifier-client-container input[type="email"] {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 16px;
+}
+
+.modifier-client-container input[type="submit"] {
+    background-color: #333;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+}
+
+.modifier-client-container input[type="submit"]:hover {
+    background-color: green;
+}
+
+.bouton-retour {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  text-decoration: none;
+  color: #333;
+  font-weight: bold;
+}
+
+.bouton-retour:hover {
+  background-color: #e0e0e0;
+}
+/* Responsive Design */
+@media (max-width: 600px) {
+    .modifier-client-container form {
+        width: 90%;
+        padding: 20px;
+    }
+}
+
+.success-message {
+    background-color: #d4edda; /* Couleur de fond verte claire */
+    color: #155724; /* Couleur du texte verte foncée */
+    padding: 10px;
+    border: 1px solid #c3e6cb;
+    border-radius: 5px;
+    text-align: center;
+    position: fixed; /* Pour positionner le message */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Pour centrer le message */
+    z-index: 9999; /* Pour afficher le message au-dessus des autres éléments */
+}

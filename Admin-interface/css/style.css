@@ -1,0 +1,262 @@
+:root {
+    --header-height: 2cm;
+    --header-background: #fff;
+    --header-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    --sidebar-background: #ffffff;
+    --content-padding: 20px;
+    --link-color: #333;
+    --hover-background: #ddd;
+    --logout-background: #ff4d4d;
+    --logout-hover-background: #cc0000;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding-top: var(--header-height);
+    background-color: #F1F5F9;
+}
+
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: var(--header-height);
+    background: var(--header-background);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.25rem; /* 20px / 16px = 1.25rem */
+    box-shadow: var(--header-box-shadow);
+    z-index: 1000;
+}
+
+.logo {
+    font-size: 1.875rem; /* 30px / 16px = 1.875rem */
+    font-weight: bold;
+}
+
+.admin-text {
+    color: orange;
+}
+/* .notification{
+    position: relative;
+    display: flex;
+    justify-content: end;
+    cursor: pointer;
+    
+} */
+.profile {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.625rem; /* 10px / 16px = 0.625rem */
+    cursor: pointer;
+    padding: 0.625rem; /* 10px / 16px = 0.625rem */
+    background: #f8f8f8;
+    border-radius: 5px;
+    transition: background 0.3s ease;
+    margin-right: 50px;
+}
+
+.profile:hover {
+    background: #e0e0e0;
+}
+
+.profile .email {
+    font-size: 0.875rem; /* 14px / 16px = 0.875rem */
+    color: var(--link-color);
+}
+
+.profile .profile-icon {
+    font-size: 1.25rem; /* 20px / 16px = 1.25rem */
+    color: #555;
+}
+
+.profile .arrow-down {
+    font-size: 0.75rem; /* 12px / 16px = 0.75rem */
+    color: #555;
+    transition: transform 0.3s ease;
+}
+
+.profile:hover .arrow-down {
+    transform: rotate(180deg);
+}
+
+
+
+.container {
+    display: flex;
+    flex: 1;
+}
+
+.content {
+    flex: 1;
+    padding: var(--content-padding);
+}
+
+footer {
+    text-align: center;
+    padding: 0.625rem; /* 10px / 16px = 0.625rem */
+    background: var(--hover-background);
+}
+
+.sidebar {
+    background: var(--sidebar-background);
+    height: calc(100vh - var(--header-height));
+    padding: var(--content-padding);
+}
+
+.sidebar nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar nav ul li {
+    display: flex;
+    align-items: center;
+    font-size: 1rem; /* 18px / 16px = 1.125rem */
+    padding: 0;
+    margin-bottom: 0.625rem; /* 10px / 16px = 0.625rem */
+    background: #fff;
+    border-radius: 5px;
+    transition: background 0.3s;
+    cursor: pointer;
+}
+
+.sidebar nav ul li a {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0.75rem 0.625rem; /* 12px 10px / 16px = 0.75rem 0.625rem */
+    text-decoration: none;
+    color: var(--link-color);
+}
+
+/* style.css */
+.sidebar nav ul li.active > a {
+    /* Couleur de fond active */
+    color: orange; /* Couleur du texte actif */
+    font-weight: bold; /* Texte en gras (facultatif) */
+    /* Ajoutez d'autres styles selon vos préférences */
+}
+
+.sidebar nav ul li:hover {
+    background: var(--hover-background);
+}
+
+.sidebar nav ul li i {
+    margin-right: 0.625rem; /* 10px / 16px = 0.625rem */
+    color: var(--link-color);
+    font-size: 1.25rem; /* 20px / 16px = 1.25rem */
+}
+
+a {
+    text-decoration: none;
+    color: var(--link-color);
+}
+
+
+
+
+
+
+
+/* Style de la barre de défilement entière */
+::-webkit-scrollbar {
+    width: 10px; /* Largeur de la barre de défilement */
+  }
+  
+  /* Style de la piste de la barre de défilement */
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Couleur de fond de la piste */
+  }
+  
+  /* Style du "pouce" (la partie que vous faites glisser) */
+  ::-webkit-scrollbar-thumb {
+    background: #888; /* Couleur du pouce */
+    border-radius: 5px; /* Bordure arrondie du pouce */
+  }
+  
+  /* Style du pouce au survol */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Couleur du pouce au survol */
+  }
+
+
+
+
+  /* style.css (ou votre fichier CSS) */
+
+/* Style de la ligne horizontale */
+.sidebar-separator {
+    
+    border: 0;
+    height: 1px;
+    background: #e0e0e0; /* Couleur de la ligne */
+    margin: 15px 10px; /* Espacement au-dessus et en dessous de la ligne */
+}
+
+/* Style du conteneur des boutons en bas */
+.sidebar-bottom {
+    height: 550px;
+    font-size: 1.25rem;
+}
+
+/* Style des boutons */
+.sidebar-button {
+    font-family: 'Poppins', sans-serif;
+
+    display: flex;
+    align-items: flex-start;
+    width: 100%;
+    padding: 15px 10px;
+    margin-bottom: 5px;
+    border: none;
+    background: none;
+    color: #555; /* Couleur du texte des boutons */
+    font-size: 15px;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    border-radius: 5px;
+}
+
+.sidebar-button:hover {
+    background-color: #ddd; /* Couleur de fond au survol */
+}
+
+/* Style de l'icône dans le bouton */
+.sidebar-button i {
+    margin-right: 15px;
+    font-size: 20px;
+}
+
+
+.notification {
+    font-family: 'Poppins', sans-serif;
+    border: 2px solid rgb(255, 0, 0);
+    box-shadow: 0 0 0 2px #ff4757;
+    margin-left: 15px;
+    border-radius: 50%;
+    background-color: red;
+    color: white;
+  }
+
+
+  .logout-btn {
+    margin-top: 390px; /* Pousse vers le bas */
+    align-self: flex-end; /* Alignement à droite */
+    width: 100%; /* Prend toute la largeur */
+  }
+
+  .logout-btn:hover{
+    background-color: rgb(250, 0, 0.3);
+    color: white;
+  }

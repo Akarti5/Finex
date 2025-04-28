@@ -1,0 +1,68 @@
+.transaction-form-container {
+    width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    font-family: 'Arial', sans-serif;
+}
+
+.transaction-form-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.transaction-form-container label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.transaction-form-container input[type="text"],
+.transaction-form-container input[type="number"] {
+    width: calc(100% - 22px); /* Ajustement pour le padding et la bordure */
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    box-sizing: border-box; /* Important pour inclure le padding et la bordure dans la largeur */
+}
+
+.transaction-form-container button[type="button"] {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    width: 100%;
+}
+
+.transaction-form-container button[type="button"]:hover {
+    background-color: #45a049;
+}
+
+.bouton-retour {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+}
+
+.bouton-retour:hover {
+    background-color: #e0e0e0;
+}
+
+.transaction-form-container h2,
+.transaction-form-container label,
+.transaction-form-container input[type="text"],
+.transaction-form-container input[type="number"],
+.transaction-form-container button[type="button"] {
+    font-family: 'Poppins', sans-serif;
+}

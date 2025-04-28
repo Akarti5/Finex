@@ -1,0 +1,185 @@
+h2,
+    .total-clients span,
+    .search-bar input[type="text"],
+    .search-bar button,
+    .add-client label,
+    .add-client input[type="text"],
+    .add-client input[type="email"],
+    .add-client button,
+    .search-results table,
+    .search-results th,
+    .search-results td {
+        font-family: 'Poppins', sans-serif;
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    .div.total-clients {
+        background-color: #e9ecef;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+        text-align: center;
+    }
+
+    .search-bar {
+        margin-bottom: 20px;
+    }
+
+    .search-bar form {
+        display: flex;
+        justify-content: center;
+    }
+
+    .search-bar input[type="text"] {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px 0 0 5px;
+        width: 300px;
+        max-width: 100%;
+    }
+
+    .search-bar button {
+        padding: 10px 15px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 0 5px 5px 0;
+        cursor: pointer;
+    }
+
+    .add-client {
+        background-color: white;
+        padding: 20px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .add-client h3 {
+        margin-bottom: 55px;
+        color: #333;
+        text-align: center;
+        font-size: 30px;
+    }
+
+    .add-client form {
+        display: grid;
+        gap: 10px;
+    }
+
+    .add-client label {
+        font-weight: bold;
+    }
+
+    .add-client input[type="text"],
+    .add-client input[type="email"] {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    .add-client button {
+        padding: 10px 15px;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .search-results {
+        background-color: white;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .search-results table {
+        max-height: 50%;
+        overflow-y: auto;
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .search-results th,
+    .search-results td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+
+    .search-results th {
+        background-color: #f2f2f2;
+    }
+
+    .search-results tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .search-bar form {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .search-bar input[type="text"] {
+            border-radius: 5px;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+
+        .search-bar button {
+            border-radius: 5px;
+            width: 100%;
+        }
+
+        .add-client form {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .bouton-retour {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #f0f0f0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        text-decoration: none;
+        color: #333;
+        font-weight: bold;
+    }
+
+    .bouton-retour:hover {
+        background-color: #e0e0e0;
+    }
+       /* ... (votre CSS existant) ... */
+
+       .code-pin-input {
+        width: 100px; /* Ajustez la largeur selon vos besoins */
+        text-align: center; /* Centre le texte à l'intérieur de l'input */
+        letter-spacing: 10px; /* Ajoute de l'espace entre les chiffres */
+    }
+
+    .success-message {
+        background-color: #d4edda;
+        color: #155724;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #c3e6cb;
+        border-radius: 5px;
+    }
+
+    .error-message {
+        background-color: #f8d7da;
+        color: #721c24;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #f5c6cb;
+        border-radius: 5px;
+    }

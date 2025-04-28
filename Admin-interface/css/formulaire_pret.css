@@ -1,0 +1,79 @@
+/* Style général du formulaire */
+#pretForm {
+    position: relative;
+    top: 17%;
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+}
+
+/* Style des labels */
+#pretForm label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Style des champs de saisie */
+#pretForm input[type="text"],
+#pretForm input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+/* Style des champs en lecture seule */
+#pretForm input[readonly] {
+    background-color: #e9ecef;
+    cursor: not-allowed;
+}
+
+/* Style du bouton */
+#pretForm button {
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#pretForm button:hover {
+    background-color: #0056b3;
+}
+
+/* Style pour le placeholder */
+#pretForm input::placeholder {
+    color: #999;
+    font-style: italic;
+}
+
+/* Style pour les messages d'erreur ou d'information */
+#pretForm .message {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+#pretForm .message.error {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+#pretForm .message.success {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
