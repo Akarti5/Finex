@@ -66,7 +66,7 @@
             <?php
             $solde_reel = $solde + $montant_prets;
             echo number_format($solde_reel, 2, ',', ' ') . " Ar";
-            ?>
+            ?>1
           </span>
         </div>
       </div>
