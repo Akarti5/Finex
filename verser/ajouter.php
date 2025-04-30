@@ -8,11 +8,34 @@ if (!file_exists($dbPath)) {
 }
 
 // Inclusion de la connexion à la base de données
-include($dbPath);// Assurez-vous que ce fichier contient les informations de connexion à la BD
+include($dbPath);
 
 // Initialiser les variables
 $message = '';
 $type = '';
+
+// Récupérer l'historique des transactions (versements)
+$transactions = [];
+
+try {
+    // Requête pour récupérer les transactions les plus récentes
+    $query = "SELECT v.id, v.numCompte, v.montant, v.dateVersement, c.Nom, c.Prenoms
+              FROM versement v
+              LEFT JOIN client c ON v.numCompte = c.numCompte
+              ORDER BY v.dateVersement DESC
+              LIMIT 10";
+              
+    $result = $conn->query($query);
+    if (!$result) {
+        throw new Exception("Erreur dans la requête: " . $conn->error);
+    }
+    
+    while ($row = $result->fetch_assoc()) {
+        $transactions[] = $row;
+    }
+} catch (Exception $e) {
+    $transactionError = "Erreur lors de la récupération de l'historique : " . $e->getMessage();
+}
 
 // Vérifier si le formulaire a été soumis
 if (isset($_POST['verser'])) {
@@ -30,280 +53,334 @@ if (isset($_POST['verser'])) {
     } else {
         // Vérifier si le solde bancaire est suffisant
         $stmt = $conn->prepare("SELECT solde FROM banque_history LIMIT 1");
-        $stmt->execute();
-        $bankResult = $stmt->get_result();
-        $bankData = $bankResult->fetch_assoc();
-        $soldeBanque = $bankData['solde'];
-
-        if ($montant > $soldeBanque) {
-            $message = "Solde bancaire insuffisant. Le solde actuel est de " . number_format($soldeBanque, 2) . " Ar";
+        if (!$stmt) {
+            $message = "Erreur de préparation de la requête: " . $conn->error;
             $type = "error";
         } else {
-            // Vérifier si le compte existe et est actif
-            $stmt = $conn->prepare("SELECT * FROM client WHERE numCompte = ? AND statut = 'actif'");
-            $stmt->bind_param("s", $numCompte);
             $stmt->execute();
-            $result = $stmt->get_result();
-            
-            if ($result->num_rows > 0) {
-                // Le compte existe et est actif
-                $client = $result->fetch_assoc();
-                
-                // Commencer une transaction
-                $conn->begin_transaction();
-                
-                try {
-                    // 1. Mettre à jour le solde du client
-                    $nouveauSolde = $client['solde'] + $montant;
-                    $stmt = $conn->prepare("UPDATE client SET solde = ? WHERE numCompte = ?");
-                    $stmt->bind_param("ds", $nouveauSolde, $numCompte);
-                    $stmt->execute();
-                    
-                    // 2. Enregistrer le versement
-                    $stmt = $conn->prepare("INSERT INTO versement (numCompte, montant) VALUES (?, ?)");
-                    $stmt->bind_param("sd", $numCompte, $montant);
-                    $stmt->execute();
-                    
-                    // 3. Mettre à jour le solde de la banque (soustraction car l'argent sort de la banque pour aller au client)
-                    $stmt = $conn->prepare("UPDATE banque_history SET solde = solde - ?");
-                    $stmt->bind_param("d", $montant);
-                    $stmt->execute();
-                    
-                    // 4. Récupérer le nouveau solde de la banque pour l'historique
-                    $stmt = $conn->prepare("SELECT solde FROM banque_history");
-                    $stmt->execute();
-                    $bankResult = $stmt->get_result();
-                    $bankData = $bankResult->fetch_assoc();
-                    $nouveauSoldeBanque = $bankData['solde'];
-                    
-                    // 5. Ajouter une entrée dans l'historique du solde bancaire
-                    $stmt = $conn->prepare("INSERT INTO banque_solde_historique (date, solde) VALUES (NOW(), ?)");
-                    $stmt->bind_param("d", $nouveauSoldeBanque);
-                    $stmt->execute();
-                    
-                    // Valider la transaction
-                    $conn->commit();
-                    
-                    $message = "Versement de " . number_format($montant, 2) . " Ar effectué avec succès sur le compte " . $numCompte;
-                    $type = "success";
-                    
-                } catch (Exception $e) {
-                    // En cas d'erreur, annuler la transaction
-                    $conn->rollback();
-                    $message = "Une erreur est survenue lors du versement : " . $e->getMessage();
-                    $type = "error";
-                }
-            } else {
-                $message = "Le compte n'existe pas ou n'est pas actif.";
+            $bankResult = $stmt->get_result();
+            $bankData = $bankResult->fetch_assoc();
+            $soldeBanque = $bankData['solde'];
+
+            if ($montant > $soldeBanque) {
+                $message = "Solde bancaire insuffisant. Le solde actuel est de " . number_format($soldeBanque, 2) . " Ar";
                 $type = "error";
+            } else {
+                // Vérifier si le compte existe et est actif
+                $stmt = $conn->prepare("SELECT * FROM client WHERE numCompte = ? AND statut = 'actif'");
+                if (!$stmt) {
+                    $message = "Erreur de préparation de la requête: " . $conn->error;
+                    $type = "error";
+                } else {
+                    $stmt->bind_param("s", $numCompte);
+                    $stmt->execute();
+                    $result = $stmt->get_result();
+                    
+                    if ($result->num_rows > 0) {
+                        // Le compte existe et est actif
+                        $client = $result->fetch_assoc();
+                        
+                        // Commencer une transaction
+                        $conn->begin_transaction();
+                        
+                        try {
+                            // 1. Mettre à jour le solde du client
+                            $nouveauSolde = $client['solde'] + $montant;
+                            $stmt = $conn->prepare("UPDATE client SET solde = ? WHERE numCompte = ?");
+                            if (!$stmt) {
+                                throw new Exception("Erreur de préparation de la requête: " . $conn->error);
+                            }
+                            $stmt->bind_param("ds", $nouveauSolde, $numCompte);
+                            $stmt->execute();
+                            
+                            // 2. Enregistrer le versement avec dateVersement
+                            $stmt = $conn->prepare("INSERT INTO versement (numCompte, montant, dateVersement) VALUES (?, ?, NOW())");
+                            if (!$stmt) {
+                                throw new Exception("Erreur de préparation de la requête: " . $conn->error);
+                            }
+                            $stmt->bind_param("sd", $numCompte, $montant);
+                            $stmt->execute();
+                            
+                            // 3. Mettre à jour le solde de la banque (soustraction car l'argent sort de la banque pour aller au client)
+                            $stmt = $conn->prepare("UPDATE banque_history SET solde = solde - ?");
+                            if (!$stmt) {
+                                throw new Exception("Erreur de préparation de la requête: " . $conn->error);
+                            }
+                            $stmt->bind_param("d", $montant);
+                            $stmt->execute();
+                            
+                            // 4. Récupérer le nouveau solde de la banque pour l'historique
+                            $stmt = $conn->prepare("SELECT solde FROM banque_history");
+                            if (!$stmt) {
+                                throw new Exception("Erreur de préparation de la requête: " . $conn->error);
+                            }
+                            $stmt->execute();
+                            $bankResult = $stmt->get_result();
+                            $bankData = $bankResult->fetch_assoc();
+                            $nouveauSoldeBanque = $bankData['solde'];
+                            
+                            // 5. Ajouter une entrée dans l'historique du solde bancaire
+                            $stmt = $conn->prepare("INSERT INTO banque_solde_historique (date, solde) VALUES (NOW(), ?)");
+                            if (!$stmt) {
+                                throw new Exception("Erreur de préparation de la requête: " . $conn->error);
+                            }
+                            $stmt->bind_param("d", $nouveauSoldeBanque);
+                            $stmt->execute();
+                            
+                            // Valider la transaction
+                            $conn->commit();
+                            
+                            $message = "Versement de " . number_format($montant, 2) . " Ar effectué avec succès sur le compte " . $numCompte;
+                            $type = "success";
+                            
+                            // Rafraîchir la liste des transactions
+                            header("Location: ".$_SERVER['PHP_SELF']);
+                            exit;
+                            
+                        } catch (Exception $e) {
+                            // En cas d'erreur, annuler la transaction
+                            $conn->rollback();
+                            $message = "Une erreur est survenue lors du versement : " . $e->getMessage();
+                            $type = "error";
+                        }
+                    } else {
+                        $message = "Le compte n'existe pas ou n'est pas actif.";
+                        $type = "error";
+                    }
+                }
             }
         }
     }
 }
 ?>
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Effectuer un Versement</title>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<div class="versement-module">
     <style>
-
-    </style>
-</head>
-<body class="page-verser">
-    <div class="verser-container">
-        <h2 class="verser-h2">Effectuer un Versement</h2>
-        <form method="POST" action="">
-            <div class="verser-form-group">
-                <label for="numCompte" class="verser-label">Numéro de Compte à Verser:</label>
-                <input type="text" id="numCompte" name="numCompte" required class="verser-input">
-            </div>
-            <div class="verser-form-group">
-                <label for="montant" class="verser-label">Montant à Verser:</label>
-                <input type="number" id="montant" name="montant" step="0.01" required class="verser-input">
-            </div>
-            <button type="submit" name="verser" class="verser-button">OK</button>
-        </form>
-    </div>
-
-    <script>
-        <?php if ($message && $type === 'success'): ?>
-            Swal.fire({
-                icon: 'success',
-                title: 'Succès!',
-                text: '<?php echo $message; ?>',
-                showConfirmButton: false,
-                timer: 5500
-            });
-        <?php elseif ($message && $type === 'error'): ?>
-            Swal.fire({
-                icon: 'error',
-                title: 'Erreur!',
-                text: '<?php echo $message; ?>',
-            });
-        <?php endif; ?>
-    </script>
-</body>
-</html>
-
-<style>
-
-
-        .verser-container {
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  
-  border-radius: 8px;
-  
-  background-color: #fff;
-
-  width: 27%; /* Prend 50% de la largeur */
-  height:85%;
-  position: absolute; /* Le positionne absolument par rapport à son ancêtre positionné */
-  top: 100px; /* Le place en haut de son ancêtre positionné */
-  left: 250px; /* Le place à gauche de son ancêtre positionné */
-  /* Les styles précédents pour l'apparence peuvent rester */
-  padding: 90px;
-  border: 1px solid #ccc;
-  box-sizing: border-box;
-}
-
-/* Optionnellement, pour s'assurer que le parent (body ou un autre conteneur) */
-/* gère bien le flottement si nécessaire */
-body::after, /* Si .verser-container est un enfant direct du body */
-.parent-de-verser::after { /* Si .verser-container a un autre parent */
-  content: "";
-  display: table;
-  clear: both;
-  position: relative; 
-}
-
-        .verser-h2 {
-            text-align: center;
-            margin-bottom: 110px;
-            color: #333;
+        /* Styles spécifiques au module de versement pour éviter les conflits */
+        .versement-module {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            width: 100%;
+            padding: 20px 0;
         }
 
-        .verser-form-group {
+        .versement-main-container {
+            display: flex;
+            width: 95%;
+            max-width: 1200px;
+            gap: 30px;
+            align-items: flex-start;
+        }
+
+        .versement-box {
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            background-color: #fff;
+            padding: 30px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .versement-form-container {
+            width: 35%;
+            flex-shrink: 0;
+        }
+
+        .versement-history-container {
+            width: 65%;
+        }
+
+        .versement-title {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #333;
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .versement-form-group {
             margin-bottom: 15px;
         }
 
-        .verser-label {
+        .versement-label {
             display: block;
             margin-bottom: 5px;
             color: #555;
-            font-weight: bold;
+            font-weight: 500;
         }
 
-        .verser-input[type="text"],
-        .verser-input[type="number"] {
-            width: calc(100% - 12px);
-            padding: 10px;
+        .versement-input {
+            width: 100%;
+            padding: 12px;
             border: 1px solid #ddd;
             border-radius: 4px;
             box-sizing: border-box;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+            font-family: 'Poppins', sans-serif;
         }
 
-        .verser-button {
+        .versement-button {
             background-color: #5cb85c;
             color: white;
-            padding: 18px 20px;
+            padding: 12px;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-size: 16px;
             transition: background-color 0.3s ease;
-            width: 97%;
+            width: 100%;
+            font-weight: 500;
+            font-family: 'Poppins', sans-serif;
         }
 
-        .verser-button:hover {
+        .versement-button:hover {
             background-color: #4cae4c;
         }
 
-        .verser-alert-success {
-            color: #155724;
-            background-color: #d4edda;
-            border: 1px solid #c3e6cb;
-            padding: 10px;
-            border-radius: 4px;
-            margin-bottom: 15px;
-        }
-
-        .verser-alert-error {
-            color: #721c24;
-            background-color: #f8d7da;
-            border: 1px solid #f5c6cb;
-            padding: 10px;
-            border-radius: 4px;
-            margin-bottom: 15px;
-        }
-
-        /* Style pour le body de la page verser.php uniquement */
-        .page-verser body {
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center; /* Centre le contenu horizontalement */
-            align-items: center; /* Centre le contenu verticalement */
-            min-height: calc(100vh - var(--header-height)); /* Ajuste la hauteur pour ne pas être caché par le header */
-            padding-top: var(--header-height); /* Maintenir l'espace pour le header */
-            background-color: #F1F5F9;
-        }
-
-        /* Ajustement pour le conteneur principal si nécessaire pour la mise en page globale */
-        .page-verser .container {
-            display: flex;
-            flex: 1;
-            /* Vous devrez peut-être ajuster cela en fonction de votre mise en page globale */
-        }
-
-        .page-verser .content {
-            flex: 1;
-            padding: var(--content-padding);
-            display: flex;
-            justify-content: center; /* Centre le formulaire dans le contenu */
-            align-items: center;
-        }
-
-        /* Assurez-vous que le formulaire est centré dans le .content */
-        .page-verser .content form {
-            width: 400px; /* Ou la largeur souhaitée du formulaire */
-        }
-
-        /* Si vous avez un sidebar et que vous voulez que le contenu "verser" prenne l'espace à droite */
-        .page-verser .container {
-            flex-direction: row; /* Assurez-vous que le conteneur est en ligne */
-        }
-
-        .page-verser .sidebar {
-            /* Vos styles de sidebar restent les mêmes */
-        }
-
-        .page-verser .content {
-            /* ... styles précédents ... */
-            margin-left: auto; /* Pousse le contenu vers la droite si le sidebar est à gauche */
-        }
-
-        /* Alternative si vous voulez un design pleine largeur pour la page de versement */
-        .page-verser.full-width-content body {
-            justify-content: center;
-            align-items: center;
-        }
-
-        .page-verser.full-width-content .container {
+        .versement-table {
             width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            border-collapse: collapse;
+            margin-top: 20px;
         }
 
-        .page-verser.full-width-content .content {
-            width: 400px; /* Largeur du formulaire */
-            padding: var(--content-padding);
-            display: block; /* Rétablit l'affichage en bloc pour le centrage auto */
-            margin: 20px auto; /* Centre le formulaire */
+        .versement-table th,
+        .versement-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
         }
-</style>
+
+        .versement-table th {
+            background-color: #f8f9fa;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .versement-table tr:hover {
+            background-color: #f1f3f5;
+        }
+        
+        .versement-montant {
+            font-weight: 500;
+            color: #28a745;
+        }
+        
+        .versement-empty-history {
+            text-align: center;
+            color: #777;
+            padding: 30px 0;
+        }
+        
+        .versement-date {
+            color: #6c757d;
+            font-size: 14px;
+        }
+        
+        /* Style responsive spécifique au module de versement */
+        @media (max-width: 900px) {
+            .versement-main-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .versement-form-container,
+            .versement-history-container {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+        }
+        
+        /* Assurer que les conteneurs conservent leurs proportions sur les écrans moyens */
+        @media (min-width: 901px) and (max-width: 1200px) {
+            .versement-form-container {
+                width: 35%;
+            }
+            
+            .versement-history-container {
+                width: 65%;
+            }
+        }
+    </style>
+
+    <div class="versement-main-container">
+        <!-- Section de versement -->
+        <div class="versement-box versement-form-container">
+            <h2 class="versement-title">Effectuer un Versement</h2>
+            <form method="POST" action="">
+                <div class="versement-form-group">
+                    <label for="numCompte" class="versement-label">Numéro de Compte à Verser:</label>
+                    <input type="text" id="numCompte" name="numCompte" required class="versement-input">
+                </div>
+                <div class="versement-form-group">
+                    <label for="montant" class="versement-label">Montant à Verser:</label>
+                    <input type="number" id="montant" name="montant" step="0.01" required class="versement-input">
+                </div>
+                <button type="submit" name="verser" class="versement-button">Effectuer le versement</button>
+            </form>
+        </div>
+        
+        <!-- Section d'historique des transactions -->
+        <div class="versement-box versement-history-container">
+            <h2 class="versement-title">Historique des Versements</h2>
+            <?php if (isset($transactionError)): ?>
+                <div class="versement-empty-history"><?php echo $transactionError; ?></div>
+            <?php elseif (empty($transactions)): ?>
+                <div class="versement-empty-history">Aucune transaction n'a été effectuée.</div>
+            <?php else: ?>
+                <table class="versement-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Num. Compte</th>
+                            <th>Client</th>
+                            <th>Montant</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($transactions as $transaction): ?>
+                            <tr>
+                                <td class="versement-date">
+                                    <?php 
+                                        $date = new DateTime($transaction['dateVersement']);
+                                        echo $date->format('D d M Y H:i'); 
+                                    ?>
+                                </td>
+                                <td><?php echo htmlspecialchars($transaction['numCompte']); ?></td>
+                                <td>
+                                    <?php 
+                                        if (!empty($transaction['Nom']) && !empty($transaction['Prenoms'])) {
+                                            echo htmlspecialchars($transaction['Prenoms']) . ' ' . htmlspecialchars($transaction['Nom']);
+                                        } else {
+                                            echo 'Client inconnu';
+                                        }
+                                    ?>
+                                </td>
+                                <td class="versement-montant"><?php echo number_format($transaction['montant'], 2) . ' Ar'; ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    <?php if ($message && $type === 'success'): ?>
+        Swal.fire({
+            icon: 'success',
+            title: 'Succès!',
+            text: '<?php echo $message; ?>',
+            showConfirmButton: false,
+            timer: 5500
+        });
+    <?php elseif ($message && $type === 'error'): ?>
+        Swal.fire({
+            icon: 'error',
+            title: 'Erreur!',
+            text: '<?php echo $message; ?>',
+        });
+    <?php endif; ?>
+});
+</script>
