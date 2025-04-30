@@ -31,7 +31,7 @@ if ($updateResult && $updateResult->num_rows > 0) {
         if ($joursRetard > 0) {
             // Calculer le nouveau montant avec les frais (0.5% par jour)
             $tauxFraisParJour = 0.01; // 0.5%
-            $fraisAujourdhui = $pret['montantARembourser'] * $tauxFraisParJour * $joursRetard;
+            $fraisAujourdhui = ($pret['montantARembourser'] * $tauxFraisParJour) * $joursRetard;
             $nouveauMontant = $pret['montantARembourser'] + $fraisAujourdhui;
             
             // Mettre à jour le montant à rembourser et la date du dernier calcul
