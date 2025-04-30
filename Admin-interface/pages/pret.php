@@ -18,13 +18,33 @@ if ($conn->query($sql_update_statut)) {
     echo "Erreur lors de la mise à jour des statuts : " . $conn->error;
 }
 
-$pretClientPath = $_SERVER['DOCUMENT_ROOT'] . "/Finex/prets/liste.php";
+// Récupération des paramètres de recherche
+$searchCompte = isset($_GET['searchCompte']) ? $_GET['searchCompte'] : '';
+$dateDebut = isset($_GET['dateDebut']) ? $_GET['dateDebut'] : '';
+$dateFin = isset($_GET['dateFin']) ? $_GET['dateFin'] : '';
 
-if (!file_exists($pretClientPath)) {
-    die("Erreur : Fichier liste.php introuvable ! Chemin: " . $pretClientPath);
+// Construction de la requête SQL avec les filtres
+$sql = "SELECT * FROM preter WHERE 1=1";
+
+if (!empty($searchCompte)) {
+    $sql .= " AND numCompte LIKE '%".mysqli_real_escape_string($conn, $searchCompte)."%'";
 }
 
-include($pretClientPath); // Inclure le fichier liste.php pour récupérer $result
+if (!empty($dateDebut)) {
+    $sql .= " AND datePret >= '".mysqli_real_escape_string($conn, $dateDebut)."'";
+}
+
+if (!empty($dateFin)) {
+    $sql .= " AND datePret <= '".mysqli_real_escape_string($conn, $dateFin)."'";
+}
+
+$sql .= " ORDER BY datePret DESC";
+
+// Exécuter la requête
+$result = $conn->query($sql);
+if (!$result) {
+    echo "Erreur dans la requête : " . $conn->error;
+}
 ?>
 
 <div class="search-container">
@@ -33,10 +53,22 @@ include($pretClientPath); // Inclure le fichier liste.php pour récupérer $resu
     </div>
     
     <h2>Tableau des Prêts</h2>
-    <div>
+    <div class="filters">
         <form method="GET" action="" class="search-form">
-            <input type="text" class="search-input" name="searchCompte" placeholder="Rechercher par n° compte" value="<?php echo htmlspecialchars($searchCompte); ?>" autocomplete="off">
-            <button type="submit" class="search-button">Rechercher</button>
+            <div class="filter-group">
+                <input type="text" class="search-input" name="searchCompte" placeholder="Rechercher par n° compte" value="<?php echo htmlspecialchars($searchCompte); ?>" autocomplete="off">
+            </div>
+            <div class="filter-group date-filters">
+                <label for="dateDebut">Du:</label>
+                <input type="date" id="dateDebut" name="dateDebut" class="date-input" value="<?php echo htmlspecialchars($dateDebut); ?>">
+                
+                <label for="dateFin">Au:</label>
+                <input type="date" id="dateFin" name="dateFin" class="date-input" value="<?php echo htmlspecialchars($dateFin); ?>">
+            </div>
+            <div class="filter-actions">
+                <button type="submit" class="search-button">Filtrer</button>
+                <a href="http://localhost/FINEX/Admin-interface/index.php?page=pret" class="reset-button">Réinitialiser</a>
+            </div>
         </form>
     </div>
 </div>
@@ -48,7 +80,7 @@ include($pretClientPath); // Inclure le fichier liste.php pour récupérer $resu
                 <th>Numéro de prêt</th>
                 <th>Numéro de compte</th>
                 <th>Montant prêté</th>
-                <th>Montant A rembourser(10%)</th>
+                <th>Montant À rembourser(10%)</th>
                 <th>Date du prêt</th>
                 <th>Date de remboursement</th>
                 <th>Statut</th>
@@ -57,7 +89,7 @@ include($pretClientPath); // Inclure le fichier liste.php pour récupérer $resu
         </thead>
         <tbody>
             <?php
-            if ($result->num_rows > 0) {
+            if ($result && $result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
                     echo "<tr>";
                     echo "<td>" . htmlspecialchars($row['numPret']) . "</td>";
@@ -81,16 +113,16 @@ include($pretClientPath); // Inclure le fichier liste.php pour récupérer $resu
                     // Appliquer la couleur de fond selon le statut
                     switch(strtolower($row['statut'])) {
                         case 'en cours':
-                            echo "color: blue ;"; // Jaune transparent
+                            echo "color: blue;";
                             break;
                         case 'en retard':
-                            echo "color: red;"; // Rouge transparent
+                            echo "color: red;";
                             break;
                         case 'remboursé':
-                            echo "color: green;"; // Vert transparent
+                            echo "color: green;";
                             break;
                         default:
-                            echo ""; // Pas de couleur pour les autres statuts
+                            echo "";
                     }
                     echo "'>";
                     
@@ -110,7 +142,7 @@ include($pretClientPath); // Inclure le fichier liste.php pour récupérer $resu
                     echo "</tr>";
                 }
             } else {
-                echo '<tr><td colspan="7">Aucun prêt trouvé.</td></tr>';
+                echo '<tr><td colspan="8">Aucun prêt trouvé.</td></tr>';
             }
             $conn->close(); // Fermeture de la connexion à la base de données
             ?>
@@ -118,37 +150,104 @@ include($pretClientPath); // Inclure le fichier liste.php pour récupérer $resu
     </table>
 </div>
 
-    
-
-
 <style>
-.table-container {
-    margin-top: 50px;
-    max-height: 700px; /* Hauteur maximale pour le défilement */
-    overflow-y: auto;
-    border-radius: 20px;
-    /* Empêcher le débordement des coins arrondis */
+.search-container {
+    margin: 20px 30px;
+}
 
+.filters {
+    background-color: #F1F5F9;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+}
+
+.search-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: flex-end;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 200px;
+}
+
+.date-filters {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    flex: 2;
+}
+
+.filter-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.search-input, .date-input {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.search-button, .reset-button, .add-button {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    font-weight: 500;
+}
+
+.search-button {
+    background-color: #007bff;
+    color: white;
+}
+
+.reset-button {
+    background-color: #6c757d;
+    color: white;
+}
+
+.add-button {
+    background-color: #28a745;
+    color: white;
+    margin-bottom: 10px;
+}
+
+.search-button:hover, .reset-button:hover, .add-button:hover {
+    opacity: 0.9;
+}
+
+.table-container {
+    margin-top: 20px;
+    max-height: 700px;
+    overflow-y: auto;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
 table {
-    width: 90%;
+    width: 100%;
     border-collapse: collapse;
-    margin: 20px 30px;
     background-color: #F1F5F9;
-    border-radius: 8px;
 }
 
 thead {
     position: sticky;
     top: 0;
-    z-index: 10; /* S'assurer que l'en-tête reste au-dessus du contenu */
+    z-index: 10;
     background-color: #f8f9fa;
-    color: #495057;
-    font-weight: 600;
 }
 
-/* Assurer que les cellules d'en-tête ont également un fond */
 th {
     background-color: #f8f9fa;
     padding: 12px 15px;
@@ -165,12 +264,6 @@ td {
 tbody tr:hover {
     background-color: #fff;
     transition: background-color 0.2s ease-in-out;
-}
-
-/* Style spécifique pour la dernière colonne */
-td:last-child {
-    text-align: center;
-    white-space: nowrap;
 }
 
 /* Styles pour la barre de défilement */
@@ -192,43 +285,17 @@ td:last-child {
     background: #555;
 }
 
-/* Styles pour les boutons d'action */
-.action-button {
-    background-color: transparent;
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    padding: 8px;
-    margin: 0 4px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
-    font-size: 1em;
-}
-
-.action-button:hover {
-    transform: scale(1.1);
-}
-
-.action-button i {
-    color: #6c757d;
-}
-
-.action-button:hover i {
-    color: #007bff;
-}
-
-.action-button.delete-button {
-    background-color: transparent;
-}
-
-.action-button.delete-button:hover i {
-    color: #dc3545;
-}
-
 /* Responsive design */
 @media (max-width: 768px) {
+    .search-form {
+        flex-direction: column;
+    }
+    
+    .date-filters {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
     table {
         border: 0;
     }

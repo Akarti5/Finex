@@ -1,4 +1,7 @@
 <?php
+// Démarrer la session en haut de la page
+session_start();
+
 // Connexion à la base de données
 $dbPath = $_SERVER['DOCUMENT_ROOT'] . "/Finex/config/db.php";
 
@@ -13,6 +16,15 @@ include($dbPath);
 // Initialiser les variables
 $message = '';
 $type = '';
+
+// Vérifier si des messages sont stockés en session
+if (isset($_SESSION['message']) && isset($_SESSION['type'])) {
+    $message = $_SESSION['message'];
+    $type = $_SESSION['type'];
+    // Effacer les messages de la session après les avoir récupérés
+    unset($_SESSION['message']);
+    unset($_SESSION['type']);
+}
 
 // Récupérer l'historique des transactions (versements)
 $transactions = [];
@@ -130,12 +142,24 @@ if (isset($_POST['verser'])) {
                             // Valider la transaction
                             $conn->commit();
                             
+                            // Stocker le message dans la session avant la redirection
+                            $_SESSION['message'] = "Versement de " . number_format($montant, 2) . " Ar effectué avec succès sur le compte " . $numCompte;
+                            $_SESSION['type'] = "success";
+                            
+                            // SOLUTION 1: Ne pas rediriger, afficher le message directement
                             $message = "Versement de " . number_format($montant, 2) . " Ar effectué avec succès sur le compte " . $numCompte;
                             $type = "success";
                             
-                            // Rafraîchir la liste des transactions
-                            header("Location: ".$_SERVER['PHP_SELF']);
+                            // SOLUTION 2: Utiliser l'URL complète de la page actuelle au lieu de PHP_SELF
+                            // Décommentez cette partie si vous préférez la redirection
+                            /*
+                            $pageActuelle = basename($_SERVER['REQUEST_URI']);
+                            if (strpos($pageActuelle, '?') !== false) {
+                                $pageActuelle = substr($pageActuelle, 0, strpos($pageActuelle, '?'));
+                            }
+                            header("Location: " . $pageActuelle);
                             exit;
+                            */
                             
                         } catch (Exception $e) {
                             // En cas d'erreur, annuler la transaction
@@ -306,7 +330,7 @@ if (isset($_POST['verser'])) {
         <!-- Section de versement -->
         <div class="versement-box versement-form-container">
             <h2 class="versement-title">Effectuer un Versement</h2>
-            <form method="POST" action="">
+            <form method="POST">
                 <div class="versement-form-group">
                     <label for="numCompte" class="versement-label">Numéro de Compte à Verser:</label>
                     <input type="text" id="numCompte" name="numCompte" required class="versement-input">

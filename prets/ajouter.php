@@ -136,7 +136,7 @@ $subject = "Confirmation de prêt - FINEX BANK";
 $message = "Cher client $nom $prenom,<br><br>"
     . "Numéro de compte : $numCompte<br><br>"
     . "Vous avez emprunté Ar $montantPrete à FINEX BANK le " . date('d M Y') . ".<br><br>"
-    . "À rembourser avant le " . date('d M Y', strtotime($dateRemboursement)) . ".<br><br>"
+    . "Vous devriez rembourser $montantARembourser avant le " . date('d M Y', strtotime($dateRemboursement)) . ".<br><br>"
     . "Merci de votre confiance.<br><br>"
     . "Cordialement,<br>FINEX BANK";
 // Puis remplacez votre section mail() par :
