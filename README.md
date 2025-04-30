@@ -105,4 +105,4 @@ Les contributions au projet FINEX sont les bienvenues. Si vous souhaitez contrib
 
 ## Licence
 
-Copyright (c) [Année] [SITRAKINIAINA Eddy Francisco]
+Copyright (c) [2025] [SITRAKINIAINA Eddy Francisco]
